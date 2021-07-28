@@ -30,21 +30,26 @@
         <View
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="5"
+            android:layout_weight="6"
             />
 
         <ImageView
             android:id="@+id/download"
             android:layout_width="0dp"
-            android:layout_weight="2.5"
+            android:layout_weight="2"
             android:layout_height="match_parent"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
             android:src="@drawable/ic_download" />
 
         <ImageView
             android:id="@+id/share"
             android:layout_width="0dp"
-            android:layout_weight="2.5"
+            android:layout_weight="2"
             android:layout_height="match_parent"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:paddingRight="16dp"
             android:src="@drawable/ic_share" />
     </LinearLayout>
 
