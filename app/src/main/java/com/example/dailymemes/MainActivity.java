@@ -4,9 +4,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -27,15 +31,40 @@ public class MainActivity extends AppCompatActivity {
     List<Meme> memes;
     MemeAdapter adapter;
     private static final String MEME_API = "https://meme-api.herokuapp.com/gimme/indiameme/50";
+    private TextView mEmptyStateTextView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         recyclerView = findViewById(R.id.list);
         memes = new ArrayList<>();
-        extractMemes();
+        View loadingIndicator = findViewById(R.id.loading_indicator);
+
+        if(checkConnection()){
+            extractMemes();
+        }else{
+            mEmptyStateTextView = (TextView) findViewById(R.id.empty_view);
+            mEmptyStateTextView.setText(R.string.no_internet_connection);
+            loadingIndicator.setVisibility(View.GONE);
+        }
     }
 
+    //check connection
+    private boolean checkConnection(){
+        ConnectivityManager cm =
+                (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+        if(isConnected){
+            return true;
+        }else{
+            return false;
+        }
+
+    }
     private void extractMemes() {
         RequestQueue queue = Volley.newRequestQueue(this);
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, MEME_API, null, new Response.Listener<JSONObject>() {
@@ -60,6 +89,8 @@ public class MainActivity extends AppCompatActivity {
                 recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
                 adapter = new MemeAdapter(getApplicationContext(),memes);
                 recyclerView.setAdapter(adapter);
+                View loadingIndicator = findViewById(R.id.loading_indicator);
+                loadingIndicator.setVisibility(View.GONE);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -70,4 +101,5 @@ public class MainActivity extends AppCompatActivity {
         });
         queue.add(jsonObjectRequest);
     }
+
 }
