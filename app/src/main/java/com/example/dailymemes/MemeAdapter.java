@@ -15,6 +15,14 @@ import java.util.List;
 public class MemeAdapter extends RecyclerView.Adapter<MemeAdapter.ViewHolder> {
     private  List<Meme> memes;
 
+    private OnItemClickListener mListener;
+    public interface OnItemClickListener{
+        void onItemClick(int position);
+    }
+    public void setOnItemClickListener(OnItemClickListener listener){
+        mListener = listener;
+    }
+
     public MemeAdapter(Context applicationContext,List<Meme> memes) {
         this.memes = memes;
     }
@@ -28,6 +36,7 @@ public class MemeAdapter extends RecyclerView.Adapter<MemeAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(MemeAdapter.ViewHolder holder, int position) {
         String memeimage = memes.get(position).getMeme();
+        String shareurl = memeimage;
         holder.setData(memeimage);
     }
 
@@ -38,9 +47,23 @@ public class MemeAdapter extends RecyclerView.Adapter<MemeAdapter.ViewHolder> {
 
     public class ViewHolder extends RecyclerView.ViewHolder{
         ImageView currentmeme;
+        ImageView shareIcon;
         public ViewHolder(View itemView) {
             super(itemView);
             currentmeme = itemView.findViewById(R.id.meme);
+            shareIcon = itemView.findViewById(R.id.share);
+            shareIcon.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(mListener != null){
+                        int position = getAdapterPosition();
+                        if(position != RecyclerView.NO_POSITION){
+                            mListener.onItemClick(position);
+                        }
+                    }
+                }
+            });
+
         }
         public void setData(String memeImage) {
             Picasso.get().load(memeImage).into(currentmeme);
