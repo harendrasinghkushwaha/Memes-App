@@ -5,6 +5,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -26,7 +27,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MemeAdapter.OnItemClickListener{
     RecyclerView recyclerView;
     List<Meme> memes;
     MemeAdapter adapter;
@@ -89,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
                 recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
                 adapter = new MemeAdapter(getApplicationContext(),memes);
                 recyclerView.setAdapter(adapter);
+                adapter.setOnItemClickListener(MainActivity.this);
                 View loadingIndicator = findViewById(R.id.loading_indicator);
                 loadingIndicator.setVisibility(View.GONE);
             }
@@ -101,5 +103,19 @@ public class MainActivity extends AppCompatActivity {
         });
         queue.add(jsonObjectRequest);
     }
+    @Override
+    public void onItemClick(int position) {
+        //Toast.makeText(getApplicationContext(),"done",Toast.LENGTH_SHORT).show();
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.setType("text/plain");
+        sendIntent.putExtra(Intent.EXTRA_SUBJECT,"Hey checkout this cool meme:)");
+        sendIntent.putExtra(Intent.EXTRA_TEXT,memes.get(position).getMeme() );
+
+
+        Intent shareIntent = Intent.createChooser(sendIntent, "Share this meme using...");
+        startActivity(shareIntent);
+    }
+
 
 }
