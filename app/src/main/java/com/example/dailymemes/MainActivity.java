@@ -4,14 +4,21 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -33,6 +40,8 @@ public class MainActivity extends AppCompatActivity implements MemeAdapter.OnIte
     MemeAdapter adapter;
     private static final String MEME_API = "https://meme-api.herokuapp.com/gimme/indiameme/50";
     private TextView mEmptyStateTextView;
+    private static final int PERMISSION_STORAGE_CODE = 1000;
+    String downloadurl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,6 +125,53 @@ public class MainActivity extends AppCompatActivity implements MemeAdapter.OnIte
         Intent shareIntent = Intent.createChooser(sendIntent, "Share this meme using...");
         startActivity(shareIntent);
     }
+    @Override
+    public void downloadImage(int position) {
+        downloadurl = memes.get(position).getMeme();
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED){
+                String pemissions = (Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                requestPermissions(new String[]{pemissions},PERMISSION_STORAGE_CODE);
+
+            }else{
+                startDownloading();
+
+            }
+        }else{
+            startDownloading();
+
+        }
+    }
+    private void startDownloading() {
+        String url = downloadurl.toString().trim();
+        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+        request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI
+                | DownloadManager.Request.NETWORK_MOBILE);
+        //request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI) | DownloadManager.Request.NETWORK_MOBILE);
+        request.setTitle("downlad");
+        request.setDescription("downloading...");
+        request.allowScanningByMediaScanner();
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,""+ System.currentTimeMillis());
+
+
+        DownloadManager manager = (DownloadManager)getSystemService(Context.DOWNLOAD_SERVICE);
+        manager.enqueue(request);
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode){
+            case PERMISSION_STORAGE_CODE:{
+                if(grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    startDownloading();
+                }else{
+                    Toast.makeText(this,"permission denide",Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
 
 
 }

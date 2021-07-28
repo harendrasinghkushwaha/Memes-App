@@ -18,6 +18,7 @@ public class MemeAdapter extends RecyclerView.Adapter<MemeAdapter.ViewHolder> {
     private OnItemClickListener mListener;
     public interface OnItemClickListener{
         void onItemClick(int position);
+        void downloadImage(int position);
     }
     public void setOnItemClickListener(OnItemClickListener listener){
         mListener = listener;
@@ -48,10 +49,12 @@ public class MemeAdapter extends RecyclerView.Adapter<MemeAdapter.ViewHolder> {
     public class ViewHolder extends RecyclerView.ViewHolder{
         ImageView currentmeme;
         ImageView shareIcon;
+        ImageView download_image;
         public ViewHolder(View itemView) {
             super(itemView);
             currentmeme = itemView.findViewById(R.id.meme);
             shareIcon = itemView.findViewById(R.id.share);
+            download_image = itemView.findViewById(R.id.download);
             shareIcon.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -63,6 +66,18 @@ public class MemeAdapter extends RecyclerView.Adapter<MemeAdapter.ViewHolder> {
                     }
                 }
             });
+            download_image.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(mListener != null){
+                        int position = getAdapterPosition();
+                        if(position != RecyclerView.NO_POSITION){
+                            mListener.downloadImage(position);
+                        }
+                    }
+                }
+            });
+
 
         }
         public void setData(String memeImage) {
