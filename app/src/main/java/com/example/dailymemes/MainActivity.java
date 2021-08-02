@@ -3,6 +3,7 @@ package com.example.dailymemes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
 
 import android.Manifest;
 import android.app.DownloadManager;
@@ -35,10 +36,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements MemeAdapter.OnItemClickListener{
-    RecyclerView recyclerView;
+    ViewPager2 viewPager2;
     List<Meme> memes;
     MemeAdapter adapter;
-    private static final String MEME_API = "https://meme-api.herokuapp.com/gimme/indiameme/50";
+    private static final String MEME_API = "https://meme-api.herokuapp.com/gimme/50";
     private TextView mEmptyStateTextView;
     private static final int PERMISSION_STORAGE_CODE = 1000;
     String downloadurl;
@@ -47,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements MemeAdapter.OnIte
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        recyclerView = findViewById(R.id.list);
+        viewPager2 = findViewById(R.id.list);
         memes = new ArrayList<>();
         View loadingIndicator = findViewById(R.id.loading_indicator);
 
@@ -96,9 +97,8 @@ public class MainActivity extends AppCompatActivity implements MemeAdapter.OnIte
                         e.printStackTrace();
                     }
                 }
-                recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
                 adapter = new MemeAdapter(getApplicationContext(),memes);
-                recyclerView.setAdapter(adapter);
+                viewPager2.setAdapter(adapter);
                 adapter.setOnItemClickListener(MainActivity.this);
                 View loadingIndicator = findViewById(R.id.loading_indicator);
                 loadingIndicator.setVisibility(View.GONE);
